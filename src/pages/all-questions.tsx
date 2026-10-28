@@ -75,7 +75,6 @@ export function AllQuestionsPage() {
     <AppShell
       header={
         <PageHeader
-          backTo="/"
           title="Toate întrebările"
           subtitle={`Afișate: ${results.length} din ${TOTAL_QUESTIONS}${filter === "all" ? "" : ` · ${CATEGORIES[filter].shortName}`}`}
           trailing={

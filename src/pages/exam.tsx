@@ -1,11 +1,8 @@
 import confetti from "canvas-confetti"
 import {
   CheckIcon,
-  ChevronRightIcon,
   CircleXIcon,
   EllipsisVerticalIcon,
-  InfinityIcon,
-  MenuIcon,
   ListIcon,
   PartyPopperIcon,
   RadiationIcon,
@@ -61,12 +58,11 @@ type ExamState = {
   finishedAt: number | null
 }
 
-type LeaveAction = "home" | "restart" | "all"
+type LeaveAction = "home" | "restart"
 
 const leaveActionLabels: Record<LeaveAction, { title: string; confirm: string }> = {
   home: { title: "Ieși din test?", confirm: "Ieși" },
   restart: { title: "Repornești testul?", confirm: "Repornește" },
-  all: { title: "Mergi la toate întrebările?", confirm: "Continuă" },
 }
 
 export function ExamPage() {
@@ -114,7 +110,6 @@ export function ExamPage() {
     setLeaveDialogOpen(false)
     if (leaveAction === "restart") startExam()
     if (leaveAction === "home") goHome()
-    if (leaveAction === "all") navigate("/all")
   }
 
   if (!exam) return <ExamHome onStart={startExam} />
@@ -196,7 +191,12 @@ export function ExamPage() {
               <NavbarPanelItem onClick={() => chooseLeave("restart")}>
                 <RotateCcwIcon /> Repornește testul
               </NavbarPanelItem>
-              <NavbarPanelItem onClick={() => chooseLeave("all")}>
+              <NavbarPanelItem
+                onClick={() => {
+                  closeMenu()
+                  navigate("/all")
+                }}
+              >
                 <ListIcon /> Vezi toate întrebările
               </NavbarPanelItem>
             </NavbarPanel>
@@ -244,26 +244,7 @@ export function ExamPage() {
   )
 }
 
-const homeMenuLinks = [
-  {
-    to: "/infinite",
-    icon: InfinityIcon,
-    title: "Mod infinit",
-    description: "Exersează fără limită, pe categoriile alese",
-  },
-  {
-    to: "/all",
-    icon: ListIcon,
-    title: "Toate întrebările",
-    description: `Caută și răsfoiește toate cele ${TOTAL_QUESTIONS} de întrebări`,
-  },
-]
-
 function ExamHome({ onStart }: { onStart: () => void }) {
-  const navigate = useNavigate()
-  const [menuOpen, setMenuOpen] = useState(false)
-  const closeMenu = () => setMenuOpen(false)
-
   return (
     <AppShell
       header={
@@ -274,33 +255,9 @@ function ExamHome({ onStart }: { onStart: () => void }) {
             </span>
           }
           title="Test CNCAN"
-          trailing={
-            <NavbarPanelToggle
-              icon={MenuIcon}
-              label="Meniu"
-              open={menuOpen}
-              onToggle={() => setMenuOpen((open) => !open)}
-            />
-          }
-          panel={
-            <NavbarPanel open={menuOpen} onClose={closeMenu}>
-              {homeMenuLinks.map((link) => (
-                <NavbarPanelItem key={link.to} className="h-auto py-2.5" onClick={() => navigate(link.to)}>
-                  <span className="flex size-9 shrink-0 items-center justify-center rounded-md border bg-background">
-                    <link.icon />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block font-semibold">{link.title}</span>
-                    <span className="block text-xs text-muted-foreground">{link.description}</span>
-                  </span>
-                  <ChevronRightIcon className="text-muted-foreground" />
-                </NavbarPanelItem>
-              ))}
-            </NavbarPanel>
-          }
         />
       }
-      aboveFooter={<InstallPrompt className="mb-4 shadow-lg shadow-black/15" />}
+      aboveFooter={<InstallPrompt className="mb-2 shadow-lg shadow-black/15" />}
       footer={
         <Button size="lg" className="h-12 w-full text-base" onClick={onStart}>
           Începe Testul

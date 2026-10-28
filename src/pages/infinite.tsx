@@ -137,7 +137,7 @@ export function InfinitePage() {
     <AppShell
       header={
         <PageHeader
-          backTo="/"
+          onBack={() => setSession(null)}
           title={`Răspunsuri corecte: ${session.correct}/${session.answered}`}
           subtitle={
             session.random
@@ -211,7 +211,6 @@ function InfiniteSetup({
     <AppShell
       header={
         <PageHeader
-          backTo="/"
           title="Mod infinit"
           trailing={
             <NavbarPanelToggle

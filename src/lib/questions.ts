@@ -36,10 +36,10 @@ export const CATEGORIES: Record<CategoryKey, Category> = {
     shortName: "Radioprotecție",
     count: questionBank.radioprotectie.length,
     styles: {
-      dot: "bg-blue-500",
-      badge: "bg-blue-100 text-blue-800",
-      panel: "border-blue-200 bg-blue-50/60",
-      selected: "border-blue-500 bg-blue-50 text-blue-950",
+      dot: "bg-orange-500",
+      badge: "bg-orange-100 text-orange-800",
+      panel: "border-orange-200 bg-orange-50/60",
+      selected: "border-orange-500 bg-orange-50 text-orange-950",
     },
   },
   legislatie: {
@@ -48,10 +48,10 @@ export const CATEGORIES: Record<CategoryKey, Category> = {
     shortName: "Legislație",
     count: questionBank.legislatie.length,
     styles: {
-      dot: "bg-green-500",
-      badge: "bg-green-100 text-green-800",
-      panel: "border-green-200 bg-green-50/60",
-      selected: "border-green-500 bg-green-50 text-green-950",
+      dot: "bg-sky-600",
+      badge: "bg-sky-100 text-sky-800",
+      panel: "border-sky-200 bg-sky-50/60",
+      selected: "border-sky-600 bg-sky-50 text-sky-950",
     },
   },
   operationala: {
@@ -60,10 +60,10 @@ export const CATEGORIES: Record<CategoryKey, Category> = {
     shortName: "Operațională",
     count: questionBank.operationala.length,
     styles: {
-      dot: "bg-purple-500",
-      badge: "bg-purple-100 text-purple-800",
-      panel: "border-purple-200 bg-purple-50/60",
-      selected: "border-purple-500 bg-purple-50 text-purple-950",
+      dot: "bg-stone-600",
+      badge: "bg-stone-200 text-stone-700",
+      panel: "border-stone-200 bg-stone-100/60",
+      selected: "border-stone-600 bg-stone-100 text-stone-950",
     },
   },
 }

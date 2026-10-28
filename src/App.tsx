@@ -1,18 +1,36 @@
-import { HashRouter, Navigate, Route, Routes } from "react-router-dom"
+import type { ComponentType } from "react"
+import { HashRouter, Navigate, useLocation } from "react-router-dom"
 
 import { AllQuestionsPage } from "@/pages/all-questions"
 import { ExamPage } from "@/pages/exam"
 import { InfinitePage } from "@/pages/infinite"
+import { TABS } from "@/lib/tabs"
+
+const tabPages: Record<(typeof TABS)[number]["path"], ComponentType> = {
+  "/": ExamPage,
+  "/infinite": InfinitePage,
+  "/all": AllQuestionsPage,
+}
+
+function TabScreens() {
+  const { pathname } = useLocation()
+
+  if (!TABS.some((tab) => tab.path === pathname)) return <Navigate to="/" replace />
+
+  return TABS.map(({ path }) => {
+    const Page = tabPages[path]
+    return (
+      <div key={path} hidden={pathname !== path}>
+        <Page />
+      </div>
+    )
+  })
+}
 
 export default function App() {
   return (
     <HashRouter>
-      <Routes>
-        <Route path="/" element={<ExamPage />} />
-        <Route path="/all" element={<AllQuestionsPage />} />
-        <Route path="/infinite" element={<InfinitePage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <TabScreens />
     </HashRouter>
   )
 }

@@ -2,7 +2,7 @@ import { ChevronLeftIcon } from 'lucide-react'
 import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 
-import { SCROLL_CONTAINER_ID } from '@/lib/scroll'
+import { TabBar } from '@/components/tab-bar'
 import { cn } from '@/lib/utils'
 
 export function AppShell({
@@ -57,7 +57,7 @@ export function AppShell({
         </header>
       )}
       <main
-        id={SCROLL_CONTAINER_ID}
+        data-scroll-container
         className="min-h-0 flex-1 overflow-y-auto overscroll-contain"
         style={header ? { paddingTop: headerHeight } : undefined}
       >
@@ -71,14 +71,19 @@ export function AppShell({
           {children}
         </div>
       </main>
-      {footer && (
-        <footer className="relative z-40 mx-auto w-full max-w-2xl shrink-0 px-1 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] in-data-keyboard-open:pb-1">
+      <footer className="relative z-40 w-full shrink-0">
+        <div className="mx-auto w-full max-w-2xl space-y-2 px-1 pb-2 in-data-keyboard-open:pb-1">
           {aboveFooter}
-          <div className="rounded-lg shadow-lg shadow-black/15 [&_[data-slot=button]]:bg-clip-border">
-            {footer}
-          </div>
-        </footer>
-      )}
+          {footer && (
+            <div className="rounded-lg shadow-lg shadow-black/15 [&_[data-slot=button]]:bg-clip-border">
+              {footer}
+            </div>
+          )}
+        </div>
+        <div className="in-data-keyboard-open:hidden">
+          <TabBar />
+        </div>
+      </footer>
     </div>
   )
 }
