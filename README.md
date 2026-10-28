@@ -1,4 +1,4 @@
-# Test CNCAN - MRIVX_M
+# Examen CNCAN - MRIVX_M
 
 Mobile-first PWA for practicing the CNCAN MRIVX_M exam questions. React + Vite + shadcn/ui, no backend.
 

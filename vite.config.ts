@@ -13,8 +13,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
-        name: 'Test CNCAN - MRIVX_M',
-        short_name: 'Test CNCAN',
+        name: 'Examen CNCAN - MRIVX_M',
+        short_name: 'Examen CNCAN',
         description:
           'Aplicație de pregătire pentru examenul CNCAN – MRIVX_M: întrebări de radioprotecție, legislație de bază și radioprotecție operațională.',
         lang: 'ro',

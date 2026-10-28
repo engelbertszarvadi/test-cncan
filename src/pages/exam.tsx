@@ -310,7 +310,7 @@ function ExamHome({ onStart }: { onStart: () => void }) {
               <RadiationIcon className="size-5" fill="currentColor" />
             </span>
           }
-          title="Test CNCAN"
+          title="Examen CNCAN"
           trailing={IS_INSTALLED_APP ? undefined : menu.toggle}
           panel={IS_INSTALLED_APP ? undefined : menu.panel}
         />
@@ -325,7 +325,7 @@ function ExamHome({ onStart }: { onStart: () => void }) {
       <div className="space-y-6 py-2">
         <div className="space-y-3">
           <Badge variant="secondary" className="tracking-wide uppercase">
-            Examen CNCAN – Nivel 2
+            Nivel 2
           </Badge>
           <div>
             <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">MRIVX_M</h1>
