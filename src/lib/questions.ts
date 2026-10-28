@@ -22,8 +22,6 @@ type Category = {
     badge: string
     panel: string
     selected: string
-    filterActive: string
-    filterIdle: string
   }
 }
 
@@ -42,8 +40,6 @@ export const CATEGORIES: Record<CategoryKey, Category> = {
       badge: "bg-blue-100 text-blue-800",
       panel: "border-blue-200 bg-blue-50/60",
       selected: "border-blue-500 bg-blue-50 text-blue-950",
-      filterActive: "bg-blue-600 text-white hover:bg-blue-600/90",
-      filterIdle: "bg-blue-50 text-blue-800 hover:bg-blue-100",
     },
   },
   legislatie: {
@@ -56,8 +52,6 @@ export const CATEGORIES: Record<CategoryKey, Category> = {
       badge: "bg-green-100 text-green-800",
       panel: "border-green-200 bg-green-50/60",
       selected: "border-green-500 bg-green-50 text-green-950",
-      filterActive: "bg-green-600 text-white hover:bg-green-600/90",
-      filterIdle: "bg-green-50 text-green-800 hover:bg-green-100",
     },
   },
   operationala: {
@@ -70,8 +64,6 @@ export const CATEGORIES: Record<CategoryKey, Category> = {
       badge: "bg-purple-100 text-purple-800",
       panel: "border-purple-200 bg-purple-50/60",
       selected: "border-purple-500 bg-purple-50 text-purple-950",
-      filterActive: "bg-purple-600 text-white hover:bg-purple-600/90",
-      filterIdle: "bg-purple-50 text-purple-800 hover:bg-purple-100",
     },
   },
 }

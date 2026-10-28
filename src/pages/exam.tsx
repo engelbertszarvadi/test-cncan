@@ -1,10 +1,11 @@
 import confetti from "canvas-confetti"
 import {
   CheckIcon,
-  ChevronLeftIcon,
+  ChevronRightIcon,
   CircleXIcon,
   EllipsisVerticalIcon,
   InfinityIcon,
+  MenuIcon,
   ListIcon,
   PartyPopperIcon,
   RadiationIcon,
@@ -18,26 +19,21 @@ import { Link, useNavigate } from "react-router-dom"
 import { AppShell, PageHeader } from "@/components/app-shell"
 import { ExamTimer } from "@/components/exam-timer"
 import { ExplanationDetails } from "@/components/explanation-details"
+import { InstallPrompt } from "@/components/install-prompt"
+import { NavbarPanel, NavbarPanelItem, NavbarPanelToggle } from "@/components/navbar-panel"
 import { QuestionActionButton, QuestionPanel } from "@/components/question-panel"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { Progress } from "@/components/ui/progress"
 import {
   CATEGORIES,
@@ -50,6 +46,7 @@ import {
   type Question,
 } from "@/lib/questions"
 import { formatDuration } from "@/lib/format"
+import { scrollToTop } from "@/lib/scroll"
 import { cn } from "@/lib/utils"
 
 type ExamState = {
@@ -57,7 +54,6 @@ type ExamState = {
   currentIndex: number
   selected: number | null
   revealed: boolean
-  explanationOpen: boolean
   score: number
   answers: number[]
   complete: boolean
@@ -77,7 +73,10 @@ export function ExamPage() {
   const navigate = useNavigate()
   const [exam, setExam] = useState<ExamState | null>(null)
   const [reviewOpen, setReviewOpen] = useState(false)
-  const [pendingLeave, setPendingLeave] = useState<LeaveAction | null>(null)
+  const [leaveAction, setLeaveAction] = useState<LeaveAction>("home")
+  const [leaveDialogOpen, setLeaveDialogOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const closeMenu = () => setMenuOpen(false)
 
   const startExam = () => {
     setExam({
@@ -85,7 +84,6 @@ export function ExamPage() {
       currentIndex: 0,
       selected: null,
       revealed: false,
-      explanationOpen: false,
       score: 0,
       answers: [],
       complete: false,
@@ -93,20 +91,30 @@ export function ExamPage() {
       finishedAt: null,
     })
     setReviewOpen(false)
-    window.scrollTo({ top: 0 })
+    scrollToTop()
   }
 
   const goHome = () => {
     setExam(null)
     setReviewOpen(false)
-    window.scrollTo({ top: 0 })
+    scrollToTop()
+  }
+
+  const requestLeave = (action: LeaveAction) => {
+    setLeaveAction(action)
+    setLeaveDialogOpen(true)
+  }
+
+  const chooseLeave = (action: LeaveAction) => {
+    setMenuOpen(false)
+    requestLeave(action)
   }
 
   const confirmLeave = () => {
-    if (pendingLeave === "restart") startExam()
-    if (pendingLeave === "home") goHome()
-    if (pendingLeave === "all") navigate("/all")
-    setPendingLeave(null)
+    setLeaveDialogOpen(false)
+    if (leaveAction === "restart") startExam()
+    if (leaveAction === "home") goHome()
+    if (leaveAction === "all") navigate("/all")
   }
 
   if (!exam) return <ExamHome onStart={startExam} />
@@ -138,14 +146,13 @@ export function ExamPage() {
   }
 
   const next = () => {
-    window.scrollTo({ top: 0 })
+    scrollToTop()
     if (!isLast) {
       setExam({
         ...exam,
         currentIndex: exam.currentIndex + 1,
         selected: null,
         revealed: false,
-        explanationOpen: false,
       })
       return
     }
@@ -157,6 +164,7 @@ export function ExamPage() {
 
   return (
     <AppShell
+      key={exam.startedAt}
       header={
         <PageHeader
           leading={
@@ -165,7 +173,7 @@ export function ExamPage() {
               size="icon-lg"
               className="-ml-2 size-10"
               aria-label="Pagina principală"
-              onClick={() => setPendingLeave("home")}
+              onClick={() => requestLeave("home")}
             >
               <XIcon className="size-5" />
             </Button>
@@ -175,25 +183,26 @@ export function ExamPage() {
           trailing={
             <div className="flex items-center gap-1">
               <ExamTimer key={exam.startedAt} startedAt={exam.startedAt} />
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon-lg" className="-mr-2 size-10" aria-label="Mai multe opțiuni">
-                    <EllipsisVerticalIcon className="size-5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="min-w-52">
-                  <DropdownMenuItem className="py-2.5" onSelect={() => setPendingLeave("restart")}>
-                    <RotateCcwIcon /> Repornește testul
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="py-2.5" onSelect={() => setPendingLeave("all")}>
-                    <ListIcon /> Vezi toate întrebările
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <NavbarPanelToggle
+                icon={EllipsisVerticalIcon}
+                label="Mai multe opțiuni"
+                open={menuOpen}
+                onToggle={() => setMenuOpen((open) => !open)}
+              />
             </div>
           }
+          panel={
+            <NavbarPanel open={menuOpen} onClose={closeMenu}>
+              <NavbarPanelItem onClick={() => chooseLeave("restart")}>
+                <RotateCcwIcon /> Repornește testul
+              </NavbarPanelItem>
+              <NavbarPanelItem onClick={() => chooseLeave("all")}>
+                <ListIcon /> Vezi toate întrebările
+              </NavbarPanelItem>
+            </NavbarPanel>
+          }
         >
-          <Progress value={((exam.currentIndex + 1) / exam.questions.length) * 100} className="h-1" />
+          <Progress value={((exam.currentIndex + 1) / exam.questions.length) * 100} className="mb-1 h-1" />
         </PageHeader>
       }
       footer={
@@ -210,58 +219,88 @@ export function ExamPage() {
         question={question}
         selected={exam.selected}
         revealed={exam.revealed}
-        explanationOpen={exam.explanationOpen}
         onSelect={(index) => !exam.revealed && setExam({ ...exam, selected: index })}
-        onShowExplanation={() => setExam({ ...exam, explanationOpen: true })}
       />
 
-      <AlertDialog open={pendingLeave !== null} onOpenChange={(open) => !open && setPendingLeave(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{pendingLeave && leaveActionLabels[pendingLeave].title}</AlertDialogTitle>
-            <AlertDialogDescription>Progresul testului curent se va pierde.</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel size="lg" className="h-11 text-base sm:min-w-32">Anulează</AlertDialogCancel>
-            <AlertDialogAction size="lg" className="h-11 text-base sm:min-w-32" onClick={confirmLeave}>
-              {pendingLeave && leaveActionLabels[pendingLeave].confirm}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <Dialog open={leaveDialogOpen} onOpenChange={setLeaveDialogOpen}>
+        <DialogContent showCloseButton={false} className="max-w-xs sm:max-w-sm">
+          <DialogHeader className="gap-1.5 text-left">
+            <DialogTitle>{leaveActionLabels[leaveAction].title}</DialogTitle>
+            <DialogDescription>Progresul testului curent se va pierde.</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline" size="lg" className="h-11 text-base sm:min-w-32">
+                Anulează
+              </Button>
+            </DialogClose>
+            <Button size="lg" className="h-11 text-base sm:min-w-32" onClick={confirmLeave}>
+              {leaveActionLabels[leaveAction].confirm}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   )
 }
 
+const homeMenuLinks = [
+  {
+    to: "/infinite",
+    icon: InfinityIcon,
+    title: "Mod infinit",
+    description: "Exersează fără limită, pe categoriile alese",
+  },
+  {
+    to: "/all",
+    icon: ListIcon,
+    title: "Toate întrebările",
+    description: `Caută și răsfoiește toate cele ${TOTAL_QUESTIONS} de întrebări`,
+  },
+]
+
 function ExamHome({ onStart }: { onStart: () => void }) {
-  const examSize = EXAM_QUESTIONS_PER_CATEGORY * CATEGORY_KEYS.length
+  const navigate = useNavigate()
+  const [menuOpen, setMenuOpen] = useState(false)
+  const closeMenu = () => setMenuOpen(false)
 
   return (
     <AppShell
       header={
         <PageHeader
           leading={
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-yellow-400 text-neutral-950">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-yellow-400 text-neutral-950">
               <RadiationIcon className="size-5" fill="currentColor" />
             </span>
           }
-          title={<span className="sr-only sm:not-sr-only">Test CNCAN</span>}
+          title="Test CNCAN"
           trailing={
-            <div className="flex gap-2">
-              <Button asChild variant="secondary" className="h-9">
-                <Link to="/infinite">
-                  <InfinityIcon data-icon="inline-start" /> Mod infinit
-                </Link>
-              </Button>
-              <Button asChild variant="outline" className="h-9">
-                <Link to="/all">
-                  <ListIcon data-icon="inline-start" /> Toate întrebările
-                </Link>
-              </Button>
-            </div>
+            <NavbarPanelToggle
+              icon={MenuIcon}
+              label="Meniu"
+              open={menuOpen}
+              onToggle={() => setMenuOpen((open) => !open)}
+            />
+          }
+          panel={
+            <NavbarPanel open={menuOpen} onClose={closeMenu}>
+              {homeMenuLinks.map((link) => (
+                <NavbarPanelItem key={link.to} className="h-auto py-2.5" onClick={() => navigate(link.to)}>
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-md border bg-background">
+                    <link.icon />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block font-semibold">{link.title}</span>
+                    <span className="block text-xs text-muted-foreground">{link.description}</span>
+                  </span>
+                  <ChevronRightIcon className="text-muted-foreground" />
+                </NavbarPanelItem>
+              ))}
+            </NavbarPanel>
           }
         />
       }
+      aboveFooter={<InstallPrompt className="mb-4 shadow-lg shadow-black/15" />}
       footer={
         <Button size="lg" className="h-12 w-full text-base" onClick={onStart}>
           Începe Testul
@@ -273,29 +312,31 @@ function ExamHome({ onStart }: { onStart: () => void }) {
           <Badge variant="secondary" className="tracking-wide uppercase">
             Examen CNCAN – Nivel 2
           </Badge>
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Test CNCAN - MRIVX_M</h1>
-          <p className="text-muted-foreground">
-            Montare, reparare, întreținere, verificare – instalații medicale
-          </p>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">MRIVX_M</h1>
+            <p className="mt-1 text-muted-foreground">
+              Montare, reparare, întreținere, verificare – instalații medicale
+            </p>
+          </div>
         </div>
 
-        <div className="rounded-xl border bg-background p-4">
+        <hr className="border-border" />
+
+        <div>
           <p className="font-medium">
-            Acest test conține {examSize} de întrebări ({EXAM_QUESTIONS_PER_CATEGORY} din fiecare
-            categorie).
+            Acest test conține {EXAM_QUESTIONS_PER_CATEGORY * CATEGORY_KEYS.length} de întrebări.
           </p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Prag de promovare: {PASS_PERCENTAGE}% · Total întrebări: {TOTAL_QUESTIONS}
-          </p>
+          <p className="mt-1 text-sm text-muted-foreground">Prag de promovare: {PASS_PERCENTAGE}%</p>
+          <p className="text-sm text-muted-foreground">Total întrebări: {TOTAL_QUESTIONS}</p>
         </div>
 
-        <div className="space-y-2.5">
+        <div className="space-y-2">
           {CATEGORY_KEYS.map((key) => {
             const category = CATEGORIES[key]
             return (
               <div
                 key={key}
-                className={cn("flex items-center gap-3 rounded-xl border p-4", category.styles.panel)}
+                className={cn("flex items-center gap-3 rounded-lg border p-3", category.styles.panel)}
               >
                 <span className={cn("size-2.5 shrink-0 rounded-full", category.styles.dot)} />
                 <div className="min-w-0 flex-1">
@@ -336,17 +377,7 @@ function ExamResults({
     <AppShell
       header={
         <PageHeader
-          leading={
-            <Button
-              variant="ghost"
-              size="icon-lg"
-              className="-ml-2 size-10"
-              aria-label="Pagina principală"
-              onClick={onHome}
-            >
-              <ChevronLeftIcon className="size-5" />
-            </Button>
-          }
+          onBack={onHome}
           title="Test Finalizat!"
         />
       }
@@ -429,7 +460,7 @@ function ReviewItem({
   return (
     <div
       className={cn(
-        "space-y-3 rounded-xl border p-4",
+        "space-y-3 overflow-hidden rounded-xl border p-4",
         isCorrect ? "border-green-200 bg-green-50/40" : "border-destructive/30 bg-destructive/5"
       )}
     >
@@ -471,7 +502,7 @@ function ReviewItem({
         })}
       </div>
       {question.explanation && (
-        <ExplanationDetails explanation={question.explanation} className="bg-background/80" />
+        <ExplanationDetails explanation={question.explanation} className="bg-background/70" />
       )}
     </div>
   )

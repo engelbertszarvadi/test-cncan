@@ -1,8 +1,8 @@
-import { CheckIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
+import { CheckIcon, ChevronLeftIcon, ChevronRightIcon, SettingsIcon } from "lucide-react"
 import { useState } from "react"
 
 import { AppShell, PageHeader } from "@/components/app-shell"
-import { BackButton } from "@/components/back-button"
+import { NavbarPanel, NavbarPanelToggle } from "@/components/navbar-panel"
 import { QuestionActionButton, QuestionPanel } from "@/components/question-panel"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
@@ -15,13 +15,13 @@ import {
   type CategoryKey,
   type Question,
 } from "@/lib/questions"
+import { scrollToTop } from "@/lib/scroll"
 import { cn } from "@/lib/utils"
 
 type Entry = {
   question: Question
   selected: number | null
   revealed: boolean
-  explanationOpen: boolean
 }
 
 type Session = {
@@ -35,7 +35,7 @@ type Session = {
 }
 
 function newEntry(question: Question): Entry {
-  return { question, selected: null, revealed: false, explanationOpen: false }
+  return { question, selected: null, revealed: false }
 }
 
 function withNextQuestion(session: Session): Session {
@@ -113,7 +113,7 @@ export function InfinitePage() {
   const submit = () => {
     if (entry.selected === null) return
     const history = [...session.history]
-    history[session.index] = { ...entry, revealed: true, explanationOpen: false }
+    history[session.index] = { ...entry, revealed: true }
     setSession({
       ...session,
       history,
@@ -124,20 +124,20 @@ export function InfinitePage() {
 
   const next = () => {
     setSession(withNextQuestion(session))
-    window.scrollTo({ top: 0 })
+    scrollToTop()
   }
 
   const previous = () => {
     if (session.index <= 0) return
     setSession({ ...session, index: session.index - 1 })
-    window.scrollTo({ top: 0 })
+    scrollToTop()
   }
 
   return (
     <AppShell
       header={
         <PageHeader
-          leading={<BackButton />}
+          backTo="/"
           title={`Răspunsuri corecte: ${session.correct}/${session.answered}`}
           subtitle={
             session.random
@@ -185,9 +185,7 @@ export function InfinitePage() {
         question={question}
         selected={entry.selected}
         revealed={entry.revealed}
-        explanationOpen={entry.explanationOpen}
         onSelect={(index) => !entry.revealed && updateEntry({ selected: index })}
-        onShowExplanation={() => updateEntry({ explanationOpen: true })}
       />
     </AppShell>
   )
@@ -206,9 +204,40 @@ function InfiniteSetup({
   onRandomChange: (random: boolean) => void
   onStart: () => void
 }) {
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const closeSettings = () => setSettingsOpen(false)
+
   return (
     <AppShell
-      header={<PageHeader leading={<BackButton />} title="Mod infinit" />}
+      header={
+        <PageHeader
+          backTo="/"
+          title="Mod infinit"
+          trailing={
+            <NavbarPanelToggle
+              icon={SettingsIcon}
+              label="Setări"
+              open={settingsOpen}
+              onToggle={() => setSettingsOpen((open) => !open)}
+            />
+          }
+          panel={
+            <NavbarPanel open={settingsOpen} onClose={closeSettings}>
+              <label className="flex cursor-pointer items-center justify-between gap-4 rounded-lg px-3 py-2.5 transition-colors hover:bg-muted">
+                <div>
+                  <h3 className="text-sm font-semibold">Ordinea întrebărilor</h3>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    {random
+                      ? "Întrebările vor fi afișate în ordine aleatorie"
+                      : "Întrebările vor fi afișate pe categorii (toate din prima categorie, apoi toate din a doua, etc.)"}
+                  </p>
+                </div>
+                <Switch checked={random} onCheckedChange={onRandomChange} aria-label="Schimbă ordinea întrebărilor" />
+              </label>
+            </NavbarPanel>
+          }
+        />
+      }
       footer={
         <Button
           size="lg"
@@ -257,18 +286,6 @@ function InfiniteSetup({
             )
           })}
         </div>
-
-        <label className="flex cursor-pointer items-center justify-between gap-4 rounded-xl border bg-background p-4">
-          <div>
-            <h3 className="font-semibold">Ordinea întrebărilor</h3>
-            <p className="mt-0.5 text-sm text-muted-foreground">
-              {random
-                ? "Întrebările vor fi afișate în ordine aleatorie"
-                : "Întrebările vor fi afișate pe categorii (toate din prima categorie, apoi toate din a doua, etc.)"}
-            </p>
-          </div>
-          <Switch checked={random} onCheckedChange={onRandomChange} aria-label="Schimbă ordinea întrebărilor" />
-        </label>
       </div>
     </AppShell>
   )

@@ -13,11 +13,11 @@ export function ExamTimer({ startedAt }: { startedAt: number }) {
 
   return (
     <span
-      className="flex items-center gap-1 text-sm font-medium text-muted-foreground tabular-nums"
+      className="flex items-center gap-1 text-sm leading-none font-medium text-muted-foreground tabular-nums"
       aria-label="Timp scurs"
     >
-      <TimerIcon className="size-4" />
-      {formatDuration(now - startedAt)}
+      <TimerIcon className="size-4 shrink-0" />
+      <span className="translate-y-px">{formatDuration(now - startedAt)}</span>
     </span>
   )
 }

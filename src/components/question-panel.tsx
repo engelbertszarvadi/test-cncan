@@ -23,16 +23,12 @@ export function QuestionPanel({
   question,
   selected,
   revealed,
-  explanationOpen,
   onSelect,
-  onShowExplanation,
 }: {
   question: Question
   selected: number | null
   revealed: boolean
-  explanationOpen: boolean
   onSelect: (index: number) => void
-  onShowExplanation: () => void
 }) {
   const isCorrect = selected === question.correctAnswer
 
@@ -75,15 +71,9 @@ export function QuestionPanel({
           </AlertTitle>
           {question.explanation && (
             <AlertDescription className="text-foreground">
-              {explanationOpen ? (
-                <p className="mt-2 border-t pt-3 leading-relaxed whitespace-pre-line">
-                  <strong>Explicație:</strong> {question.explanation}
-                </p>
-              ) : (
-                <Button variant="outline" className="mt-2 h-9" onClick={onShowExplanation}>
-                  Vezi explicația
-                </Button>
-              )}
+              <p className="mt-2 border-t pt-3 leading-relaxed whitespace-pre-line">
+                <strong>Explicație:</strong> {question.explanation}
+              </p>
             </AlertDescription>
           )}
         </Alert>
@@ -114,7 +104,7 @@ export function QuestionActionButton({
   }
   return (
     <Button size="lg" className="h-12 w-full text-base" disabled={selected === null} onClick={onSubmit}>
-      {selected === null ? "Selectează un răspuns" : "Trimite Răspunsul"}
+      {selected === null ? "Selectează un răspuns" : "Trimite"}
     </Button>
   )
 }
