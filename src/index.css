@@ -138,21 +138,17 @@
 @keyframes overlay-show {
   from {
     opacity: 0;
-    backdrop-filter: blur(0);
   }
   to {
     opacity: 1;
-    backdrop-filter: blur(6px);
   }
 }
 
 @keyframes overlay-hide {
   from {
     opacity: 1;
-    backdrop-filter: blur(6px);
   }
   to {
     opacity: 0;
-    backdrop-filter: blur(0);
   }
 }

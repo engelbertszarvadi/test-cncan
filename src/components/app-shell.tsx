@@ -1,9 +1,9 @@
-import { ChevronLeftIcon } from "lucide-react"
-import { useLayoutEffect, useRef, useState, type ReactNode } from "react"
-import { Link } from "react-router-dom"
+import { ChevronLeftIcon } from 'lucide-react'
+import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { Link } from 'react-router-dom'
 
-import { SCROLL_CONTAINER_ID } from "@/lib/scroll"
-import { cn } from "@/lib/utils"
+import { SCROLL_CONTAINER_ID } from '@/lib/scroll'
+import { cn } from '@/lib/utils'
 
 export function AppShell({
   header,
@@ -25,7 +25,9 @@ export function AppShell({
     const headerElement = headerRef.current
     if (!headerElement) return
     const update = () => {
-      const panel = headerElement.querySelector<HTMLElement>("[data-slot=navbar-panel]")
+      const panel = headerElement.querySelector<HTMLElement>(
+        '[data-slot=navbar-panel]',
+      )
       setHeaderHeight(headerElement.offsetHeight - (panel?.offsetHeight ?? 0))
     }
     update()
@@ -37,11 +39,19 @@ export function AppShell({
   return (
     <div className="relative flex h-dvh flex-col overflow-hidden bg-muted/40">
       {header && (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 z-30 h-[calc(env(safe-area-inset-top)+3rem)] bg-background"
+        >
+          <div className="size-full bg-muted/40" />
+        </div>
+      )}
+      {header && (
         <header
           ref={headerRef}
-          className="pointer-events-none absolute inset-x-0 top-0 z-40 mx-auto w-full max-w-2xl px-1 pt-[max(0.25rem,env(safe-area-inset-top))]"
+          className="pointer-events-none absolute inset-x-0 top-0 z-40 mx-auto w-full max-w-2xl px-1 pt-[calc(env(safe-area-inset-top)+1.2rem)]"
         >
-          <div className="pointer-events-auto rounded-2xl border bg-background/95 px-4 py-2 shadow-lg shadow-black/5 backdrop-blur">
+          <div className="pointer-events-auto rounded-2xl border bg-background px-4 py-2 shadow-lg shadow-black/5">
             {header}
           </div>
         </header>
@@ -53,18 +63,20 @@ export function AppShell({
       >
         <div
           className={cn(
-            "mx-auto w-full max-w-2xl px-4 py-4 sm:py-8 motion-safe:animate-in motion-safe:duration-300 motion-safe:fade-in motion-safe:slide-in-from-bottom-3",
-            !header && "pt-[max(1rem,env(safe-area-inset-top))]",
-            className
+            'mx-auto w-full max-w-2xl px-4 py-4 sm:py-8 motion-safe:animate-in motion-safe:duration-300 motion-safe:fade-in motion-safe:slide-in-from-bottom-3',
+            !header && 'pt-[max(1rem,env(safe-area-inset-top))]',
+            className,
           )}
         >
           {children}
         </div>
       </main>
       {footer && (
-        <footer className="relative z-40 mx-auto w-full max-w-2xl shrink-0 px-1 pb-[max(0.25rem,env(safe-area-inset-bottom))]">
+        <footer className="relative z-40 mx-auto w-full max-w-2xl shrink-0 px-1 pb-[calc(env(safe-area-inset-bottom)+0.75rem)]">
           {aboveFooter}
-          <div className="rounded-lg shadow-lg shadow-black/15 [&_[data-slot=button]]:bg-clip-border">{footer}</div>
+          <div className="rounded-lg shadow-lg shadow-black/15 [&_[data-slot=button]]:bg-clip-border">
+            {footer}
+          </div>
         </footer>
       )}
     </div>
@@ -72,7 +84,7 @@ export function AppShell({
 }
 
 const backClassName =
-  "-ml-2 mr-auto flex min-h-10 min-w-0 items-center gap-1.5 rounded-lg py-1 pr-5 pl-2 text-left outline-none transition-colors hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 active:bg-muted"
+  '-ml-2 mr-auto flex min-h-10 min-w-0 items-center gap-1.5 rounded-lg py-1 pr-5 pl-2 text-left outline-none transition-colors hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 active:bg-muted'
 
 export function PageHeader({
   leading,
@@ -96,7 +108,9 @@ export function PageHeader({
   const heading = (
     <div className="min-w-0 flex-1">
       <div className="truncate text-sm font-semibold">{title}</div>
-      {subtitle && <div className="truncate text-xs text-muted-foreground">{subtitle}</div>}
+      {subtitle && (
+        <div className="truncate text-xs text-muted-foreground">{subtitle}</div>
+      )}
     </div>
   )
   const backContent = (
@@ -115,7 +129,12 @@ export function PageHeader({
             {backContent}
           </Link>
         ) : onBack ? (
-          <button type="button" aria-label="Înapoi" onClick={onBack} className={backClassName}>
+          <button
+            type="button"
+            aria-label="Înapoi"
+            onClick={onBack}
+            className={backClassName}
+          >
             {backContent}
           </button>
         ) : (
