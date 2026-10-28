@@ -37,7 +37,7 @@ export function AppShell({
   }, [])
 
   return (
-    <div className="relative flex h-dvh flex-col overflow-hidden bg-muted/40">
+    <div className="fixed inset-x-0 top-(--viewport-top,0px) flex h-(--viewport-height,100dvh) flex-col overflow-hidden bg-muted/40">
       {header && (
         <div
           aria-hidden
@@ -72,7 +72,7 @@ export function AppShell({
         </div>
       </main>
       {footer && (
-        <footer className="relative z-40 mx-auto w-full max-w-2xl shrink-0 px-1 pb-[calc(env(safe-area-inset-bottom)+0.75rem)]">
+        <footer className="relative z-40 mx-auto w-full max-w-2xl shrink-0 px-1 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] in-data-keyboard-open:pb-1">
           {aboveFooter}
           <div className="rounded-lg shadow-lg shadow-black/15 [&_[data-slot=button]]:bg-clip-border">
             {footer}
