@@ -242,7 +242,7 @@ function ExamHome({ onStart }: { onStart: () => void }) {
         <PageHeader
           leading={
             <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-yellow-400 text-neutral-950">
-              <RadiationIcon className="size-5" />
+              <RadiationIcon className="size-5" fill="currentColor" />
             </span>
           }
           title={<span className="sr-only sm:not-sr-only">Test CNCAN</span>}
