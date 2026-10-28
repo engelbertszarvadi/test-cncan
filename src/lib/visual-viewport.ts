@@ -17,6 +17,7 @@ export function trackVisualViewport() {
     } else {
       root.style.removeProperty("--viewport-height")
       root.style.removeProperty("--viewport-top")
+      if (window.scrollX !== 0 || window.scrollY !== 0) window.scrollTo(0, 0)
     }
   }
 
@@ -25,4 +26,7 @@ export function trackVisualViewport() {
   viewport.addEventListener("scroll", update)
   document.addEventListener("focusin", update)
   document.addEventListener("focusout", () => requestAnimationFrame(update))
+  window.addEventListener("scroll", update)
+  window.addEventListener("resize", update)
+  window.addEventListener("orientationchange", () => setTimeout(update, 300))
 }
