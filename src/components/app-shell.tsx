@@ -1,8 +1,9 @@
 import { ChevronLeftIcon } from 'lucide-react'
-import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 
 import { TabBar } from '@/components/tab-bar'
+import { IS_INSTALLED_APP } from '@/lib/display-mode'
 import { cn } from '@/lib/utils'
 
 export function AppShell({
@@ -18,40 +19,11 @@ export function AppShell({
   children: ReactNode
   className?: string
 }) {
-  const headerRef = useRef<HTMLElement>(null)
-  const [headerHeight, setHeaderHeight] = useState(0)
-
-  useLayoutEffect(() => {
-    const headerElement = headerRef.current
-    if (!headerElement) return
-    const update = () => {
-      const panel = headerElement.querySelector<HTMLElement>(
-        '[data-slot=navbar-panel]',
-      )
-      setHeaderHeight(headerElement.offsetHeight - (panel?.offsetHeight ?? 0))
-    }
-    update()
-    const observer = new ResizeObserver(update)
-    observer.observe(headerElement)
-    return () => observer.disconnect()
-  }, [])
-
   return (
     <div className="fixed inset-x-0 top-(--viewport-top,0px) flex h-(--viewport-height,100dvh) flex-col overflow-hidden bg-muted/40">
       {header && (
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 z-30 h-[calc(env(safe-area-inset-top)+3rem)] bg-background"
-        >
-          <div className="size-full bg-muted/40" />
-        </div>
-      )}
-      {header && (
-        <header
-          ref={headerRef}
-          className="pointer-events-none absolute inset-x-0 top-0 z-40 mx-auto w-full max-w-2xl px-1 pt-[calc(env(safe-area-inset-top)+1.2rem)]"
-        >
-          <div className="pointer-events-auto rounded-2xl border bg-background px-4 py-2 shadow-lg shadow-black/5">
+        <header className="relative z-40 mx-auto w-full max-w-2xl shrink-0 px-1 pt-[calc(env(safe-area-inset-top)+1.2rem)]">
+          <div className="relative rounded-2xl border bg-background px-4 py-2 shadow-lg shadow-black/5 has-[[data-slot=collapsible-content]]:rounded-b-none has-[[data-slot=collapsible-content]]:border-b-transparent">
             {header}
           </div>
         </header>
@@ -59,11 +31,10 @@ export function AppShell({
       <main
         data-scroll-container
         className="min-h-0 flex-1 overflow-y-auto overscroll-contain"
-        style={header ? { paddingTop: headerHeight } : undefined}
       >
         <div
           className={cn(
-            'mx-auto w-full max-w-2xl px-4 py-4 sm:py-8 motion-safe:animate-in motion-safe:duration-300 motion-safe:fade-in motion-safe:slide-in-from-bottom-3',
+            'mx-auto w-full max-w-2xl px-4 py-4 sm:py-8',
             !header && 'pt-[max(1rem,env(safe-area-inset-top))]',
             className,
           )}
@@ -80,9 +51,11 @@ export function AppShell({
             </div>
           )}
         </div>
-        <div className="in-data-keyboard-open:hidden">
-          <TabBar />
-        </div>
+        {IS_INSTALLED_APP && (
+          <div className="in-data-keyboard-open:hidden">
+            <TabBar />
+          </div>
+        )}
       </footer>
     </div>
   )

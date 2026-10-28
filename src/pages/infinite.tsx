@@ -16,6 +16,7 @@ import {
   type Question,
 } from "@/lib/questions"
 import { scrollToTop } from "@/lib/scroll"
+import { IS_INSTALLED_APP } from "@/lib/display-mode"
 import { cn } from "@/lib/utils"
 
 type Entry = {
@@ -137,7 +138,8 @@ export function InfinitePage() {
     <AppShell
       header={
         <PageHeader
-          onBack={() => setSession(null)}
+          backTo={IS_INSTALLED_APP ? undefined : "/"}
+          onBack={IS_INSTALLED_APP ? () => setSession(null) : undefined}
           title={`Răspunsuri corecte: ${session.correct}/${session.answered}`}
           subtitle={
             session.random
@@ -211,6 +213,7 @@ function InfiniteSetup({
     <AppShell
       header={
         <PageHeader
+          backTo={IS_INSTALLED_APP ? undefined : "/"}
           title="Mod infinit"
           trailing={
             <NavbarPanelToggle
@@ -224,7 +227,7 @@ function InfiniteSetup({
             <NavbarPanel open={settingsOpen} onClose={closeSettings}>
               <label className="flex cursor-pointer items-center justify-between gap-4 rounded-lg px-3 py-2.5 transition-colors hover:bg-muted">
                 <div>
-                  <h3 className="text-sm font-semibold">Ordinea întrebărilor</h3>
+                  <h3 className="text-sm font-semibold">Ordine aleatorie</h3>
                   <p className="mt-0.5 text-xs text-muted-foreground">
                     {random
                       ? "Întrebările vor fi afișate în ordine aleatorie"
@@ -254,7 +257,7 @@ function InfiniteSetup({
           <p className="text-muted-foreground">Alege categoriile din care vrei să primești întrebări:</p>
         </div>
 
-        <div className="space-y-2.5">
+        <div className="space-y-2">
           {CATEGORY_KEYS.map((key) => {
             const category = CATEGORIES[key]
             const isSelected = selectedCategories.includes(key)
@@ -265,21 +268,22 @@ function InfiniteSetup({
                 aria-pressed={isSelected}
                 onClick={() => onToggleCategory(key)}
                 className={cn(
-                  "flex w-full items-center justify-between gap-4 rounded-xl border-2 bg-background p-4 text-left transition-all outline-none focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.99]",
-                  isSelected ? category.styles.selected : "border-border hover:bg-muted/50"
+                  "flex w-full items-center gap-3 rounded-lg border p-3 text-left transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+                  isSelected ? category.styles.panel : "bg-background hover:bg-muted/50"
                 )}
               >
-                <div>
+                <span className={cn("size-2.5 shrink-0 rounded-full", category.styles.dot)} />
+                <div className="min-w-0 flex-1">
                   <h3 className="leading-snug font-semibold">{category.name}</h3>
-                  <p className="text-sm opacity-75">{category.count} întrebări</p>
+                  <p className="text-xs text-muted-foreground">{category.count} întrebări</p>
                 </div>
                 <span
                   className={cn(
-                    "flex size-6 shrink-0 items-center justify-center rounded-full border-2 transition-all",
-                    isSelected ? cn("border-transparent text-white", category.styles.dot) : "border-input"
+                    "flex size-5 shrink-0 items-center justify-center rounded-full border transition-colors",
+                    isSelected ? cn("border-transparent text-white", category.styles.dot) : "border-input bg-background"
                   )}
                 >
-                  {isSelected && <CheckIcon className="size-3.5" strokeWidth={3} />}
+                  {isSelected && <CheckIcon className="size-3" strokeWidth={3} />}
                 </span>
               </button>
             )

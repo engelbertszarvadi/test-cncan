@@ -18,9 +18,9 @@ import {
   type Question,
 } from "@/lib/questions"
 import { scrollToTop } from "@/lib/scroll"
+import { IS_INSTALLED_APP } from "@/lib/display-mode"
 import { cn } from "@/lib/utils"
 
-type Filter = CategoryKey | "all"
 
 type IndexedQuestion = {
   categoryKey: CategoryKey
@@ -42,7 +42,7 @@ const indexedQuestions: IndexedQuestion[] = CATEGORY_KEYS.flatMap((categoryKey) 
 
 export function AllQuestionsPage() {
   const [search, setSearch] = useState("")
-  const [filter, setFilter] = useState<Filter>("all")
+  const [selectedCategories, setSelectedCategories] = useState<CategoryKey[]>([])
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const [filtersOpen, setFiltersOpen] = useState(false)
 
@@ -53,30 +53,40 @@ export function AllQuestionsPage() {
     const term = normalizeText(trimmed)
     const id = isNumeric ? parseInt(trimmed, 10) : null
     return indexedQuestions.filter((item) => {
-      if (filter !== "all" && item.categoryKey !== filter) return false
+      if (selectedCategories.length > 0 && !selectedCategories.includes(item.categoryKey)) return false
       if (!term) return true
       return item.question.id === id || item.searchText.includes(term)
     })
-  }, [trimmed, isNumeric, filter])
+  }, [trimmed, isNumeric, selectedCategories])
 
   const updateSearch = (value: string) => {
     setSearch(value)
     setVisibleCount(PAGE_SIZE)
   }
 
-  const updateFilter = (value: Filter) => {
-    setFilter(value)
+  const updateCategories = (categories: CategoryKey[]) => {
+    setSelectedCategories(categories.length === CATEGORY_KEYS.length ? [] : categories)
     setVisibleCount(PAGE_SIZE)
-    setFiltersOpen(false)
     scrollToTop()
   }
+
+  const toggleCategory = (key: CategoryKey) => {
+    updateCategories(
+      selectedCategories.includes(key)
+        ? selectedCategories.filter((selected) => selected !== key)
+        : CATEGORY_KEYS.filter((category) => category === key || selectedCategories.includes(category))
+    )
+  }
+
+  const filterSummary = selectedCategories.map((key) => CATEGORIES[key].shortName).join(", ")
 
   return (
     <AppShell
       header={
         <PageHeader
+          backTo={IS_INSTALLED_APP ? undefined : "/"}
           title="Toate întrebările"
-          subtitle={`Afișate: ${results.length} din ${TOTAL_QUESTIONS}${filter === "all" ? "" : ` · ${CATEGORIES[filter].shortName}`}`}
+          subtitle={`Afișate: ${results.length} din ${TOTAL_QUESTIONS}${filterSummary ? ` · ${filterSummary}` : ""}`}
           trailing={
             <NavbarPanelToggle
               icon={ListFilterIcon}
@@ -84,23 +94,26 @@ export function AllQuestionsPage() {
               open={filtersOpen}
               onToggle={() => setFiltersOpen((open) => !open)}
               indicator={
-                filter !== "all" && (
-                  <span
-                    className={cn(
-                      "absolute top-2 right-2 size-2 rounded-full ring-2 ring-background",
-                      CATEGORIES[filter].styles.dot
-                    )}
-                  />
+                selectedCategories.length > 0 && (
+                  <span className="absolute top-1.5 right-1 flex -space-x-0.5">
+                    {selectedCategories.map((key) => (
+                      <span
+                        key={key}
+                        className={cn("size-2 rounded-full ring-2 ring-background", CATEGORIES[key].styles.dot)}
+                      />
+                    ))}
+                  </span>
                 )
               }
             />
           }
           panel={
             <FilterPanel
-              filter={filter}
+              selectedCategories={selectedCategories}
               open={filtersOpen}
               onClose={() => setFiltersOpen(false)}
-              onFilterChange={updateFilter}
+              onShowAll={() => updateCategories([])}
+              onToggleCategory={toggleCategory}
             />
           }
         />
@@ -147,7 +160,7 @@ export function AllQuestionsPage() {
             className="mt-4 h-10"
             onClick={() => {
               updateSearch("")
-              updateFilter("all")
+              updateCategories([])
             }}
           >
             Resetează filtrele
@@ -175,45 +188,47 @@ export function AllQuestionsPage() {
 }
 
 function FilterPanel({
-  filter,
+  selectedCategories,
   open,
   onClose,
-  onFilterChange,
+  onShowAll,
+  onToggleCategory,
 }: {
-  filter: Filter
+  selectedCategories: CategoryKey[]
   open: boolean
   onClose: () => void
-  onFilterChange: (filter: Filter) => void
+  onShowAll: () => void
+  onToggleCategory: (key: CategoryKey) => void
 }) {
-  const options: { key: Filter; label: string; count: number; dot: string }[] = [
-    { key: "all", label: "Toate", count: TOTAL_QUESTIONS, dot: "bg-foreground" },
+  const showingAll = selectedCategories.length === 0
+  const options = [
+    { key: "all", label: "Toate", count: TOTAL_QUESTIONS, dot: "bg-foreground", checked: showingAll, onClick: onShowAll },
     ...CATEGORY_KEYS.map((key) => ({
       key,
       label: CATEGORIES[key].shortName,
       count: CATEGORIES[key].count,
       dot: CATEGORIES[key].styles.dot,
+      checked: selectedCategories.includes(key),
+      onClick: () => onToggleCategory(key),
     })),
   ]
 
   return (
-    <NavbarPanel open={open} onClose={onClose} role="radiogroup" aria-label="Categorie">
-      {options.map((option) => {
-        const isActive = filter === option.key
-        return (
-          <NavbarPanelItem
-            key={option.key}
-            role="radio"
-            aria-checked={isActive}
-            active={isActive}
-            onClick={() => onFilterChange(option.key)}
-          >
-            <span className={cn("size-2 shrink-0 rounded-full", option.dot)} />
-            <span className="flex-1">{option.label}</span>
-            <span className="text-xs text-muted-foreground tabular-nums">{option.count}</span>
-            <CheckIcon className={cn("size-4 shrink-0", !isActive && "invisible")} />
-          </NavbarPanelItem>
-        )
-      })}
+    <NavbarPanel open={open} onClose={onClose} role="group" aria-label="Categorii">
+      {options.map((option) => (
+        <NavbarPanelItem
+          key={option.key}
+          role="checkbox"
+          aria-checked={option.checked}
+          active={option.checked}
+          onClick={option.onClick}
+        >
+          <span className={cn("size-2 shrink-0 rounded-full", option.dot)} />
+          <span className="flex-1">{option.label}</span>
+          <span className="text-xs text-muted-foreground tabular-nums">{option.count}</span>
+          <CheckIcon className={cn("size-4 shrink-0", !option.checked && "invisible")} />
+        </NavbarPanelItem>
+      ))}
     </NavbarPanel>
   )
 }

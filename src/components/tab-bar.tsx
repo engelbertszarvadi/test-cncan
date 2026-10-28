@@ -14,12 +14,12 @@ export function TabBar() {
             end
             className={({ isActive }) =>
               cn(
-                "group/tab flex flex-col items-center gap-0.5 rounded-xl py-1.5 text-[11px] font-medium transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+                "group/tab flex flex-col items-center gap-0.5 rounded-xl py-1.5 text-[11px] font-medium outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
                 isActive ? "active text-foreground" : "text-muted-foreground"
               )
             }
           >
-            <tab.icon className="size-5 fill-background transition-colors group-[.active]/tab:fill-yellow-400" />
+            <tab.icon className="size-5 fill-background group-[.active]/tab:fill-yellow-400" />
             {tab.label}
           </NavLink>
         ))}

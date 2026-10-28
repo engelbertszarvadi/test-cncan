@@ -21,7 +21,6 @@ type Category = {
     dot: string
     badge: string
     panel: string
-    selected: string
   }
 }
 
@@ -39,7 +38,6 @@ export const CATEGORIES: Record<CategoryKey, Category> = {
       dot: "bg-orange-500",
       badge: "bg-orange-100 text-orange-800",
       panel: "border-orange-200 bg-orange-50/60",
-      selected: "border-orange-500 bg-orange-50 text-orange-950",
     },
   },
   legislatie: {
@@ -51,7 +49,6 @@ export const CATEGORIES: Record<CategoryKey, Category> = {
       dot: "bg-sky-600",
       badge: "bg-sky-100 text-sky-800",
       panel: "border-sky-200 bg-sky-50/60",
-      selected: "border-sky-600 bg-sky-50 text-sky-950",
     },
   },
   operationala: {
@@ -63,7 +60,6 @@ export const CATEGORIES: Record<CategoryKey, Category> = {
       dot: "bg-stone-600",
       badge: "bg-stone-200 text-stone-700",
       panel: "border-stone-200 bg-stone-100/60",
-      selected: "border-stone-600 bg-stone-100 text-stone-950",
     },
   },
 }

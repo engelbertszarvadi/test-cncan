@@ -63,9 +63,9 @@ export function NavbarPanel({
   }, [open, onClose])
 
   return (
-    <Collapsible ref={rootRef} open={open} data-slot="navbar-panel">
-      <CollapsibleContent className="-mx-4 overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-        <div className="space-y-1 px-2 pt-3 pb-1" {...props}>
+    <Collapsible ref={rootRef} open={open} data-slot="navbar-panel" className="absolute inset-x-[-1px] top-full">
+      <CollapsibleContent className="overflow-hidden rounded-b-2xl border border-t-0 bg-background shadow-lg shadow-black/5 data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+        <div className="space-y-1 px-2 pt-1 pb-3" {...props}>
           {children}
         </div>
       </CollapsibleContent>

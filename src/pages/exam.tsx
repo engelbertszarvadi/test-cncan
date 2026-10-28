@@ -1,9 +1,12 @@
 import confetti from "canvas-confetti"
 import {
   CheckIcon,
+  ChevronRightIcon,
   CircleXIcon,
   EllipsisVerticalIcon,
+  InfinityIcon,
   ListIcon,
+  MenuIcon,
   PartyPopperIcon,
   RadiationIcon,
   RotateCcwIcon,
@@ -44,6 +47,7 @@ import {
 } from "@/lib/questions"
 import { formatDuration } from "@/lib/format"
 import { scrollToTop } from "@/lib/scroll"
+import { IS_INSTALLED_APP } from "@/lib/display-mode"
 import { cn } from "@/lib/utils"
 
 type ExamState = {
@@ -244,7 +248,59 @@ export function ExamPage() {
   )
 }
 
+const homeMenuLinks = [
+  {
+    to: "/infinite",
+    icon: InfinityIcon,
+    title: "Mod infinit",
+    description: "Exersează fără limită, pe categoriile alese",
+  },
+  {
+    to: "/all",
+    icon: ListIcon,
+    title: "Toate întrebările",
+    description: `Caută și răsfoiește toate cele ${TOTAL_QUESTIONS} de întrebări`,
+  },
+]
+
+function useHomeMenu() {
+  const navigate = useNavigate()
+  const [menuOpen, setMenuOpen] = useState(false)
+  const closeMenu = () => setMenuOpen(false)
+
+  return {
+    toggle: (
+      <NavbarPanelToggle icon={MenuIcon} label="Meniu" open={menuOpen} onToggle={() => setMenuOpen((open) => !open)} />
+    ),
+    panel: (
+      <NavbarPanel open={menuOpen} onClose={closeMenu}>
+        {homeMenuLinks.map((link) => (
+          <NavbarPanelItem
+            key={link.to}
+            className="h-auto py-2.5"
+            onClick={() => {
+              closeMenu()
+              navigate(link.to)
+            }}
+          >
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-md border bg-background">
+              <link.icon />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block font-semibold">{link.title}</span>
+              <span className="block text-xs text-muted-foreground">{link.description}</span>
+            </span>
+            <ChevronRightIcon className="text-muted-foreground" />
+          </NavbarPanelItem>
+        ))}
+      </NavbarPanel>
+    ),
+  }
+}
+
 function ExamHome({ onStart }: { onStart: () => void }) {
+  const menu = useHomeMenu()
+
   return (
     <AppShell
       header={
@@ -255,6 +311,8 @@ function ExamHome({ onStart }: { onStart: () => void }) {
             </span>
           }
           title="Test CNCAN"
+          trailing={IS_INSTALLED_APP ? undefined : menu.toggle}
+          panel={IS_INSTALLED_APP ? undefined : menu.panel}
         />
       }
       aboveFooter={<InstallPrompt className="mb-2 shadow-lg shadow-black/15" />}

@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react"
 
+import { IS_INSTALLED_APP } from "@/lib/display-mode"
+
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>
@@ -22,13 +24,6 @@ window.addEventListener("appinstalled", () => {
   deferredPrompt = null
   notify()
 })
-
-function isStandalone() {
-  return (
-    window.matchMedia("(display-mode: standalone)").matches ||
-    (navigator as Navigator & { standalone?: boolean }).standalone === true
-  )
-}
 
 function isIos() {
   return (
@@ -65,7 +60,7 @@ export function useInstallPrompt() {
   }, [])
 
   let mode: InstallPromptMode = null
-  if (!dismissed && isPhone() && !isStandalone()) {
+  if (!dismissed && isPhone() && !IS_INSTALLED_APP) {
     if (deferredPrompt) mode = "native"
     else if (isIos()) mode = "ios"
   }

@@ -19,8 +19,9 @@ function TabScreens() {
 
   return TABS.map(({ path }) => {
     const Page = tabPages[path]
+    const active = pathname === path
     return (
-      <div key={path} hidden={pathname !== path}>
+      <div key={path} hidden={!active}>
         <Page />
       </div>
     )
