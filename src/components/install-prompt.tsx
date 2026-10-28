@@ -40,7 +40,7 @@ export function InstallPrompt({ className }: { className?: string }) {
       onAnimationEnd={() => closing && dismiss()}
     >
       <div
-        className="flex shrink-0 items-center justify-center rounded-[22%] bg-yellow-400 text-neutral-950"
+        className="flex shrink-0 items-center justify-center rounded-[22%] bg-neutral-950 text-yellow-400"
         style={{ width: iconSize, height: iconSize }}
       >
         <RadiationIcon className="size-[66%]" fill="currentColor" aria-hidden />

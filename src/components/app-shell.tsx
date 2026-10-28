@@ -23,7 +23,7 @@ export function AppShell({
     <div className="fixed inset-x-0 top-(--viewport-top,0px) flex h-(--viewport-height,100dvh) flex-col overflow-hidden bg-muted/40">
       {header && (
         <header className="relative z-40 mx-auto w-full max-w-2xl shrink-0 px-1 pt-[calc(env(safe-area-inset-top)+1.2rem)]">
-          <div className="relative rounded-2xl border bg-background px-4 py-2 shadow-lg shadow-black/5 has-[[data-slot=collapsible-content]]:rounded-b-none has-[[data-slot=collapsible-content]]:border-b-transparent">
+          <div className="relative rounded-2xl border bg-background px-4 py-2 shadow-lg shadow-black/5 has-[[data-slot=collapsible-content]:not([hidden])]:rounded-b-none has-[[data-slot=collapsible-content]:not([hidden])]:border-b-transparent">
             {header}
           </div>
         </header>
